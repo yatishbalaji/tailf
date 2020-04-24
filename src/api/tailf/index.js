@@ -7,14 +7,13 @@ let last_modified = '';
 let socketIo = '';
 
 function readFile(loc, start, end, socket = false, prevData = '') {
-    var fileStream = fs.createReadStream(loc, { start: start, end: end });
-    // const prevCount = prevData.split(/[\r\n]/g);
+    const fileStream = fs.createReadStream(loc, { start: start, end: end });
 
     fileStream.on('data', function(data) {
         if (socket) {
             const data2 = `${data.toString()}${prevData}`;
             const count = data2.split(/[\r\n]/g).length;
-            // console.log(start, start-bytesToRead)
+
             if ( count === 10 || start-bytesToRead < 0) {
                 socket.emit('last10', data2);
             } else if (count < 10) {
@@ -23,7 +22,7 @@ function readFile(loc, start, end, socket = false, prevData = '') {
                 socket.emit('last10', data2.split(/[\n\r]/g).splice(-10).join('</br>'));
             }
         } else {
-            socketIo.sockets.emit('newLines', data.toString());
+            socketIo.sockets.emit('newLines', data.toString().trim());
         }
     });
 }
